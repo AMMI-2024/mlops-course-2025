@@ -73,3 +73,54 @@ with DAG(
     )
 
     push_task >> pull_task
+
+
+# Fetch weather data
+def fetch_weather_data(**context):
+    api_key = "..."
+    city = "London"
+    response = requests.get(
+        f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{city}?unitGroup=metric&include=current&key={api_key}&contentType=json"
+    )
+    data = response.json()
+    temp = data["currentConditions"]["temp"]
+    context["ti"].xcom_push(key="temperature", value=temp)
+
+
+# Process data
+def process_data(**context):
+    temperature = context["ti"].xcom_pull(
+        task_ids="fetch_weather_data", key="temperature"
+    )
+    temp_k = temperature + 273.15
+    context["ti"].xcom_push(key="temp_K", value=temp_k)
+
+
+def save_to_file(**context):
+    temp_k = context["ti"].xcom_pull(task_ids="process_data", key="temp_K")
+    with open("........../tmp/weather_data.txt", "w") as f:
+        f.write(f"Current temperature: {temp_k} °K")
+
+
+# DAG definition
+with DAG(
+    "weather_pipeline",
+    start_date=datetime(2024, 9, 19),
+    schedule_interval=None,
+    catchup=False,
+) as dag4:
+    fetch_task = PythonOperator(
+        task_id="fetch_weather_data",
+        python_callable=fetch_weather_data,
+        provide_context=True,
+    )
+
+    process_task = PythonOperator(
+        task_id="process_data", python_callable=process_data, provide_context=True
+    )
+
+    save_task = PythonOperator(
+        task_id="save_data", python_callable=save_to_file, provide_context=True
+    )
+
+    fetch_task >> process_task >> save_task
