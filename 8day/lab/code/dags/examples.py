@@ -102,6 +102,31 @@ def save_to_file(**context):
         f.write(f"Current temperature: {temp_k} °K")
 
 
+def trigger_github_workflow(**context):
+    temperature = context["ti"].xcom_pull(
+        task_ids="fetch_weather_data", key="temperature"
+    )
+
+    github_token = "..."
+    repo_owner = "..."
+    repo_name = "..."
+    workflow_file = "..."
+    workflow_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/actions/workflows/{workflow_file}/dispatches"
+
+    headers = {
+        "Authorization": f"token {github_token}",
+        "Accept": "application/vnd.github.v3+json",
+    }
+
+    payload = {"ref": "main", "inputs": {"temperature": str(temperature)}}
+
+    response = requests.post(workflow_url, json=payload, headers=headers)
+    if response.status_code == 204:
+        print("GitHub workflow triggered successfully")
+    else:
+        print(f"Failed to trigger GitHub workflow: {response.status_code}")
+
+
 # DAG definition
 with DAG(
     "weather_pipeline",
@@ -123,4 +148,11 @@ with DAG(
         task_id="save_data", python_callable=save_to_file, provide_context=True
     )
 
+    github_task = PythonOperator(
+        task_id="github_task",
+        python_callable=trigger_github_workflow,
+        provide_context=True,
+    )
+
     fetch_task >> process_task >> save_task
+    fetch_task >> github_task
