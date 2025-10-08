@@ -7,14 +7,14 @@ This lab session is to learn how to deploy Apache Airflow on a cloud virtual mac
 ## Prerequisites
 
 - Completed Day 8 (Airflow basics)
-- Google or AWS account (for free-tier VM)
+- Azure, Google Cloud, or AWS account (for free-tier VM)
 - Terminal/SSH client
 - Basic Linux command knowledge
 
 ## What You'll Learn
 
 1. **Cloud VM Setup**
-   - Create free-tier VM on GCP or AWS
+   - Create free-tier VM on Azure, GCP, or AWS
    - Configure VM instances
    - Manage cloud resources
 
@@ -42,14 +42,14 @@ This lab session is to learn how to deploy Apache Airflow on a cloud virtual mac
 
 ```
 9day/
-├── README.md                    # This file
+├── README.md                         # This file
 └── lab/
-    ├── day9.md                  # Main lab instructions
+    ├── day9.md                       # Main lab instructions (all platforms)
     └── code/
-        ├── requirements.txt     # Python dependencies
-        ├── setup_airflow.sh     # Airflow installation script
-        ├── start_airflow.sh     # Start Airflow services
-        ├── stop_airflow.sh      # Stop Airflow services
+        ├── requirements.txt          # Python dependencies
+        ├── setup_airflow.sh          # Airflow installation script
+        ├── start_airflow.sh          # Start Airflow services
+        ├── stop_airflow.sh           # Stop Airflow services
         └── dags/
             ├── simple_vm_dag.py      # Basic DAG with system info
             └── monitoring_dag.py     # System monitoring DAG
@@ -60,9 +60,10 @@ This lab session is to learn how to deploy Apache Airflow on a cloud virtual mac
 ### For Instructors
 
 **Setup Requirements:**
-- Students need their own cloud accounts (GCP/AWS free tier)
+- Students need their own cloud accounts (Azure/GCP/AWS free tier)
 - No shared VM needed - students create individual VMs
 - Provide lab instructions: `lab/day9.md`
+- **Recommended:** Azure (most students already have accounts)
 
 **Lab Flow:**
 1. VM Setup
@@ -74,21 +75,28 @@ This lab session is to learn how to deploy Apache Airflow on a cloud virtual mac
 
 ### For Students
 
-1. **Read the instructions:** Start with `lab/day9.md`
-2. **Choose your platform:** GCP (recommended) or AWS
+1. **Read the instructions:** 
+   - **Azure users:** Start with `lab/AZURE_QUICK_START.md` for fastest setup ⚡
+   - **All platforms:** Use `lab/day9.md` for detailed instructions
+2. **Choose your platform:** Azure (recommended), GCP, or AWS
 3. **Follow step-by-step:** Each section builds on the previous
 4. **Ask for help:** Don't hesitate if you get stuck
 5. **Clean up:** Delete/stop your VM when done to avoid charges
 
 ## VM Platforms
 
-### Google Cloud Platform (Recommended)
+### Microsoft Azure (Recommended for Students)
+- **Free credits:** $200 for 30 days + 12 months free services
+- **Machine type:** B2s (2 vCPU, 4GB RAM) or B1s (1 vCPU, 1GB - free tier)
+- **Student program:** Azure for Students (no credit card required)
+
+### Google Cloud Platform
 - **Free credits:** $300 for 90 days
 - **Machine type:** e2-medium (2 vCPU, 4GB RAM)
 - **Easier setup:** Browser-based SSH available
 - **Student-friendly:** Clear interface
 
-### AWS Free Tier (Alternative)
+### AWS Free Tier
 - **Free tier:** 12 months
 - **Instance type:** t2.micro (1 vCPU, 1GB RAM)
 - **More limited:** Smaller resources but sufficient
@@ -135,6 +143,8 @@ Shows:
 ## Additional Resources
 
 - [Apache Airflow Docs](https://airflow.apache.org/docs/)
+- [Azure Free Account](https://azure.microsoft.com/free/)
+- [Azure for Students](https://azure.microsoft.com/free/students/)
 - [GCP Free Tier Guide](https://cloud.google.com/free/docs/gcp-free-tier)
 - [AWS Free Tier Guide](https://aws.amazon.com/free/)
 - [Linux Namespaces Explained](https://man7.org/linux/man-pages/man7/namespaces.7.html)

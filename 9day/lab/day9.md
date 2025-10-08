@@ -8,8 +8,9 @@
   - [Learning Objectives](#learning-objectives)
   - [Prerequisites](#prerequisites)
   - [Part 1: Setting Up a Free Cloud VM](#part-1-setting-up-a-free-cloud-vm)
-    - [Option A: Google Cloud Platform (Recommended)](#option-a-google-cloud-platform-recommended)
-    - [Option B: AWS Free Tier (Alternative)](#option-b-aws-free-tier-alternative)
+    - [Option A: Microsoft Azure (Recommended for Students)](#option-a-microsoft-azure-recommended-for-students)
+    - [Option B: Google Cloud Platform](#option-b-google-cloud-platform)
+    - [Option C: AWS Free Tier](#option-c-aws-free-tier)
   - [Part 2: SSH Connection to Your VM](#part-2-ssh-connection-to-your-vm)
     - [Task 1: Generate SSH Key Pair](#task-1-generate-ssh-key-pair)
     - [Task 2: Connect to Your VM](#task-2-connect-to-your-vm)
@@ -48,7 +49,7 @@ In this lab, you will deploy Apache Airflow on a cloud virtual machine (VM) and 
 
 By the end of this lab, you will be able to:
 
-- Set up a free-tier cloud VM (GCP or AWS)
+- Set up a free-tier cloud VM (Azure, GCP, or AWS)
 - Connect to a remote VM using SSH
 - Install and configure Apache Airflow on a Linux VM
 - Understand Linux process namespaces and isolation
@@ -60,7 +61,7 @@ By the end of this lab, you will be able to:
 ## Prerequisites
 
 - A laptop with terminal/command line access
-- A Google account (for GCP) or AWS account
+- A Microsoft account (for Azure), Google account (for GCP), or AWS account
 - Basic knowledge of Linux commands
 - Familiarity with Apache Airflow from Day 8
 
@@ -68,7 +69,97 @@ By the end of this lab, you will be able to:
 
 ## Part 1: Setting Up a Free Cloud VM
 
-### Option A: Google Cloud Platform (Recommended)
+### Option A: Microsoft Azure (Recommended for Students)
+
+Azure offers $200 free credits for new users (valid for 30 days), plus 12 months of free services including free B1s VM.
+
+**Step 1: Create Azure Account**
+
+1. Go to [Azure Portal](https://portal.azure.com/)
+2. Sign in with your Microsoft account (or create one)
+3. Click **Start Free** or go to [Azure Free Account](https://azure.microsoft.com/free/)
+4. Complete registration (requires credit card for verification, but won't charge during free period)
+5. You'll receive:
+   - **$200 credit** for 30 days
+   - **12 months** of free services (includes B1s VM)
+
+**Step 2: Create a Virtual Machine**
+
+1. In Azure Portal, click **Create a resource**
+2. Search for **"Ubuntu Server"** and select **Ubuntu Server 22.04 LTS**
+3. Click **Create**
+
+**Step 3: Configure VM Basics**
+
+1. **Subscription:** Azure for Students or Free Trial
+2. **Resource group:** 
+   - Click "Create new"
+   - Name: `airflow-lab-rg`
+3. **Virtual machine name:** `airflow-vm`
+4. **Region:** Choose closest to you (e.g., `East US`, `West Europe`)
+5. **Availability options:** No infrastructure redundancy required
+6. **Security type:** Standard
+7. **Image:** Ubuntu Server 22.04 LTS - Gen2
+8. **Size:** 
+   - Click "See all sizes"
+   - Select **B2s** (2 vCPUs, 4 GB RAM) - Best for this lab
+   - Or **B1s** (1 vCPU, 1 GB RAM) - Free tier eligible but may be slow
+
+**Step 4: Configure Administrator Account**
+
+1. **Authentication type:** SSH public key (recommended) or Password
+2. **Username:** `azureuser` (or your choice)
+3. **SSH public key source:** 
+   - Select "Generate new key pair"
+   - Key pair name: `airflow-vm_key`
+   - Or select "Use existing public key" if you have one
+
+**Step 5: Configure Inbound Ports**
+
+1. **Public inbound ports:** Allow selected ports
+2. **Select inbound ports:** 
+   - ✅ SSH (22)
+   - ✅ HTTP (80)
+
+**Step 6: Configure Disks**
+
+1. Click **Next: Disks**
+2. **OS disk type:** Standard SSD (default is fine)
+3. **OS disk size:** 30 GB (default)
+
+**Step 7: Configure Networking**
+
+1. Click **Next: Networking**
+2. **Virtual network:** (auto-created)
+3. **Subnet:** (auto-created)
+4. **Public IP:** (auto-created)
+5. **NIC network security group:** Basic
+6. **Public inbound ports:** Allow selected ports (SSH, HTTP)
+
+**Step 8: Review and Create**
+
+1. Click **Review + create**
+2. Review the configuration
+3. Click **Create**
+4. **Important:** When prompted, **Download private key** and save it securely
+   - File will be named: `airflow-vm_key.pem`
+   - Save to a safe location (e.g., `~/Downloads/`)
+
+**Step 9: Wait for Deployment**
+
+- Deployment takes 1-3 minutes
+- Click **Go to resource** when complete
+
+**Step 10: Note Your VM Details**
+
+1. In VM overview page, find:
+   - **Public IP address** (e.g., `20.123.45.67`)
+   - **Private IP address**
+   - **DNS name** (optional)
+
+---
+
+### Option B: Google Cloud Platform
 
 GCP offers $300 free credits for new users, valid for 90 days.
 
@@ -104,7 +195,7 @@ GCP offers $300 free credits for new users, valid for 90 days.
 
 ---
 
-### Option B: AWS Free Tier (Alternative)
+### Option C: AWS Free Tier
 
 AWS offers 12 months of free tier access.
 
@@ -140,6 +231,18 @@ AWS offers 12 months of free tier access.
 
 ### Task 1: Generate SSH Key Pair
 
+**For Azure:**
+
+You already downloaded the private key during VM creation (`airflow-vm_key.pem`).
+
+```bash
+# Move key to .ssh directory (optional but recommended)
+mv ~/Downloads/airflow-vm_key.pem ~/.ssh/
+
+# Set correct permissions (REQUIRED)
+chmod 400 ~/.ssh/airflow-vm_key.pem
+```
+
 **For GCP (using built-in SSH):**
 
 GCP provides browser-based SSH. You can also use your terminal:
@@ -164,6 +267,26 @@ chmod 400 ~/Downloads/airflow-key.pem
 ```
 
 ### Task 2: Connect to Your VM
+
+**For Azure:**
+
+```bash
+# Connect using your downloaded key
+ssh -i ~/.ssh/airflow-vm_key.pem azureuser@<PUBLIC-IP>
+
+# Example:
+# ssh -i ~/.ssh/airflow-vm_key.pem azureuser@20.123.45.67
+```
+
+**Alternative - Use Azure Cloud Shell (browser-based):**
+1. In Azure Portal, click the Cloud Shell icon (top right, looks like `>_`)
+2. Choose **Bash**
+3. Upload your private key or use: `ssh azureuser@<PUBLIC-IP>`
+
+**Alternative - Use Azure Bastion (if available):**
+1. Go to your VM in Azure Portal
+2. Click **Connect** → **Bastion**
+3. Enter your username and SSH key or password
 
 **For GCP:**
 
@@ -285,6 +408,32 @@ chmod +x setup_airflow.sh
 - ✅ Creating admin user (username: `admin`, password: `admin`)
 
 ### Task 3: Configure Firewall Rules
+
+**For Azure:**
+
+Add a Network Security Group (NSG) rule to allow port 8080:
+
+**Method 1: Azure Portal (Easy)**
+1. Go to your VM in Azure Portal
+2. Click **Networking** (left sidebar)
+3. Click **Add inbound port rule**
+4. Configure:
+   - **Source:** Any
+   - **Source port ranges:** *
+   - **Destination:** Any
+   - **Service:** Custom
+   - **Destination port ranges:** `8080`
+   - **Protocol:** TCP
+   - **Action:** Allow
+   - **Priority:** 1001 (or any available)
+   - **Name:** `Allow-Airflow-8080`
+5. Click **Add**
+
+**Method 2: Azure CLI**
+```bash
+# Create NSG rule for port 8080
+az vm open-port --port 8080 --resource-group airflow-lab-rg --name airflow-vm
+```
 
 **For GCP:**
 
@@ -523,8 +672,10 @@ airflow scheduler -D
 
 **Solution:**
 - Verify VM is running in cloud console
-- Check external IP hasn't changed
+- Check external/public IP hasn't changed
 - Verify SSH key permissions: `chmod 400 ~/.ssh/your-key`
+- **For Azure:** Ensure NSG rule allows port 22 (SSH)
+- **For Azure:** Check if VM is in "Running" state (not "Stopped (deallocated)")
 
 ### Issue 4: Out of memory
 
@@ -542,6 +693,38 @@ airflow webserver -p 8080 -D --workers 1
 ## Cleanup
 
 **To avoid charges, stop or delete your VM when done:**
+
+**For Azure:**
+
+**Method 1: Stop VM (keeps it for later use)**
+```bash
+# Using Azure CLI
+az vm stop --resource-group airflow-lab-rg --name airflow-vm
+
+# Deallocate to stop billing
+az vm deallocate --resource-group airflow-lab-rg --name airflow-vm
+```
+
+Or use Azure Portal:
+1. Go to your VM
+2. Click **Stop** (top toolbar)
+3. Confirm - VM will be deallocated (no compute charges)
+
+**Method 2: Delete VM (permanent)**
+```bash
+# Delete just the VM
+az vm delete --resource-group airflow-lab-rg --name airflow-vm --yes
+
+# Delete entire resource group (VM + all associated resources)
+az group delete --name airflow-lab-rg --yes
+```
+
+Or use Azure Portal:
+1. Go to **Resource groups**
+2. Select `airflow-lab-rg`
+3. Click **Delete resource group**
+4. Type the resource group name to confirm
+5. Click **Delete**
 
 **For GCP:**
 ```bash
@@ -565,7 +748,7 @@ Or use the Console: **Compute Engine** → **VM instances** → Select VM → **
 
 In this lab, you:
 
-✅ Set up a free-tier cloud VM (GCP or AWS)  
+✅ Set up a free-tier cloud VM (Azure, GCP, or AWS)  
 ✅ Connected to a remote VM using SSH  
 ✅ Installed and configured Apache Airflow on a Linux server  
 ✅ Learned about Linux process namespaces and isolation  
@@ -584,6 +767,8 @@ In this lab, you:
 
 - [Apache Airflow Documentation](https://airflow.apache.org/docs/)
 - [Linux Namespaces](https://man7.org/linux/man-pages/man7/namespaces.7.html)
+- [Azure Free Account](https://azure.microsoft.com/free/)
+- [Azure for Students](https://azure.microsoft.com/free/students/)
 - [GCP Free Tier](https://cloud.google.com/free)
 - [AWS Free Tier](https://aws.amazon.com/free/)
 - [SSH Best Practices](https://www.ssh.com/academy/ssh/config)

@@ -48,7 +48,7 @@ The repository is organized by the day of the lesson. Each day has its own folde
 - GitHub Actions integration
 
 ### Day 9: Cloud VM Deployment ⭐ NEW
-- Remote VM setup on GCP/AWS
+- Remote VM setup on Azure/GCP/AWS
 - SSH and remote access
 - Deploying Airflow on cloud VMs
 - Linux process namespaces
@@ -67,8 +67,9 @@ The repository is organized by the day of the lesson. Each day has its own folde
 
 Day 9 requires students to set up their own cloud VMs. Please review:
 - `9day/README.md` - Lab overview and structure
-- `9day/VM_SETUP_GUIDE.md` - Instructor guide for VM requirements
-- `9day/lab/day9.md` - Detailed student instructions
-- `9day/lab/QUICK_REFERENCE.md` - Command cheat sheet
 
-**Students need:** A Google Cloud or AWS account with free-tier access
+- `9day/lab/day9.md` - Detailed instructions (Azure, GCP, AWS)
+
+**Students need:** An Azure, Google Cloud, or AWS account with free-tier access
+
+**Recommended:** Azure (most students have accounts, no credit card needed for students)
