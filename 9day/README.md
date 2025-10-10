@@ -76,7 +76,6 @@ This lab session is to learn how to deploy Apache Airflow on a cloud virtual mac
 ### For Students
 
 1. **Read the instructions:** 
-   - **Azure users:** Start with `lab/AZURE_QUICK_START.md` for fastest setup ⚡
    - **All platforms:** Use `lab/day9.md` for detailed instructions
 2. **Choose your platform:** Azure (recommended), GCP, or AWS
 3. **Follow step-by-step:** Each section builds on the previous
